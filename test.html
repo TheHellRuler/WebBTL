@@ -239,10 +239,13 @@
             <label for="Catsel">Category</label>
             <select name="Cat" id="Catsel" class="Catsel">
               <option value="Food">Food</option>
-             <option value="Cloth">Cloth</option> Cloth 
-             <option value="Electronics">Electronics</option> Electronics
-             <option value="Cosmetics">Cosmetics</option> Cosmetics
-             <option value="Others">Others</option> Others
+             <option value="Cloth">Cloth</option> 
+             <option value="Electronics">Electronics</option> 
+             <option value="Cosmetics">Cosmetics</option> 
+             <option value="Accesseries">Accesseries</option>
+             <option value="Health">Health</option>
+             <option value="Eyewear">Eyewear</option>
+             <option value="Others">Others</option> 
             </select></div>
           </div>
           <div class="input-container">
@@ -369,7 +372,7 @@
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('http://localhost:4000/upload', {
+    fetch('/upload', {
       method: 'POST',
       body: formData
     })
