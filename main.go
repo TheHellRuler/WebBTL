@@ -44,6 +44,17 @@ type Item struct {
 	Desc   string             `json:"desc" bson:"desc"`
 	ShId   string             `json:"shid" bson:"shid"`
 }
+type ResForApi struct {
+}
+type Shop struct {
+	ID      primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	SName   string             `json:"name" bson:"name"`
+	OName   string             `json:"uname" bson:"uname"`
+	Area    string             `json:"area" bson:"area"`
+	SPass   string             `json:"pass" bson:"pass"`
+	MLink   string             `json:"lnk" bson:"lnk"`
+	Contact string             `json:"contact" bson:"contact"`
+}
 
 var (
 	adcoll, cmscoll *mongo.Collection
@@ -52,9 +63,11 @@ var (
 func main() {
 	godotenv.Load()
 	router := mux.NewRouter()
-	router.HandleFunc("/", basicAuth(Home))
+	router.HandleFunc("/", basicAuth(Home, false))
 	router.HandleFunc("/upload", ToTele)
 	router.HandleFunc("/apiforapp", Appesh)
+	router.HandleFunc("/apiforshop", ApiForShop)
+	router.HandleFunc("/admin", basicAuth(Shopesh, true))
 	/*
 		router.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(r.Body)
@@ -113,7 +126,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 			datfr["Nm"] = bod["name"]
 			datfr["Dt"] = data
 			datfr["Id"] = bod["idd"]
-			tmpl, _ := template.ParseFiles("test.html")
+			tmpl, _ := template.ParseFiles("templates\\test.html")
 			tmpl.Execute(w, datfr)
 		}
 	case "POST":
@@ -125,27 +138,42 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-func basicAuth(next http.HandlerFunc) http.HandlerFunc {
+func basicAuth(next http.HandlerFunc, ad bool) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
 			username, password, ok := r.BasicAuth()
 			if ok && CheckInp(username) {
-				passwordHash := sha256.Sum256([]byte(password))
-				res := adcoll.FindOne(ctx.TODO(), bson.D{{Key: "uname", Value: username}})
-				if err := res.Err(); err == nil {
-					var resUser User
-					res.Decode(&resUser)
-					expectedPasswordHash := sha256.Sum256([]byte(resUser.Pass))
+				if ad {
+					usernameHash := sha256.Sum256([]byte(username))
+					passwordHash := sha256.Sum256([]byte(password))
+					expectedUsernameHash := sha256.Sum256([]byte(os.Getenv("USER")))
+					expectedPasswordHash := sha256.Sum256([]byte(os.Getenv("PASS")))
+
+					usernameMatch := (subtle.ConstantTimeCompare(usernameHash[:], expectedUsernameHash[:]) == 1)
 					passwordMatch := (subtle.ConstantTimeCompare(passwordHash[:], expectedPasswordHash[:]) == 1)
 
-					if passwordMatch {
-						bod := make(map[string]string)
-						bod["name"] = resUser.Name
-						bod["idd"] = resUser.ID.Hex()
-						str, _ := json.Marshal(bod)
-						r.Body = io.NopCloser(strings.NewReader(string(str)))
+					if usernameMatch && passwordMatch {
 						next.ServeHTTP(w, r)
 						return
+					}
+				} else {
+					passwordHash := sha256.Sum256([]byte(password))
+					res := adcoll.FindOne(ctx.TODO(), bson.D{{Key: "uname", Value: username}})
+					if err := res.Err(); err == nil {
+						var resUser User
+						res.Decode(&resUser)
+						expectedPasswordHash := sha256.Sum256([]byte(resUser.Pass))
+						passwordMatch := (subtle.ConstantTimeCompare(passwordHash[:], expectedPasswordHash[:]) == 1)
+
+						if passwordMatch {
+							bod := make(map[string]string)
+							bod["name"] = resUser.Name
+							bod["idd"] = resUser.ID.Hex()
+							str, _ := json.Marshal(bod)
+							r.Body = io.NopCloser(strings.NewReader(string(str)))
+							next.ServeHTTP(w, r)
+							return
+						}
 					}
 				}
 			}
@@ -199,3 +227,34 @@ var strforlogout = `
 </body>
 </html>
 `
+
+func ApiForShop(w http.ResponseWriter, r *http.Request) {
+	cur, _ := adcoll.Find(ctx.TODO(), bson.D{{}})
+	var Shops []Shop
+	if err := cur.All(ctx.TODO(), &Shops); err != nil {
+		fmt.Println(err.Error())
+	}
+	data, _ := json.Marshal(Shops)
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(data))
+}
+
+func Shopesh(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		{
+			tmpl, _ := template.ParseFiles("templates\\admin.html")
+			var Data []Shop
+			res, _ := adcoll.Find(ctx.TODO(), bson.D{{}})
+			res.All(ctx.TODO(), &Data)
+			tmpl.Execute(w, Data)
+		}
+	case "POST":
+		{
+			dat := json.NewDecoder(r.Body)
+			var shopTo Shop
+			dat.Decode(&shopTo)
+			adcoll.InsertOne(ctx.TODO(), shopTo)
+		}
+	}
+}

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Content Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #121212; /* Dark background */
+      color: #fff; /* White text */
+    }
+
+    header {
+      background-color: #1A1A1A; /* Darker grey header */
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    main {
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .card {
+      background-color: #1A1A1A; /* Darker grey card background */
+      color: #fff; /* White text */
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: calc(50% - 1rem); /* Adjusted card width for 2 cards in a row */
+      box-sizing: border-box; /* Including padding and border in width calculation */
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        width: calc(33.33% - 1rem); /* Adjusted card width for 3 cards in a row */
+      }
+    }
+
+    .card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      margin-bottom: 0.5rem; /* Adjusted margin */
+      overflow: hidden; /* Prevent overflow */
+      text-overflow: ellipsis; /* Show ellipsis for overflowed content */
+      white-space: nowrap; /* Prevent text wrapping */
+    }
+
+    .card button {
+      padding: 0.5rem; /* Reduced padding */
+      width: auto; /* Adjusted width */
+      border: none;
+      border-radius: 6px;
+      background-color: #37474f; /* Darker blue-grey button */
+      color: #fff; /* White text */
+      cursor: pointer;
+    }
+
+    .card button:hover {
+      background-color: #546e7a; /* Darker hover color */
+    }
+
+    #addProductButton {
+      padding: 0.5rem 1rem; /* Adjusted padding */
+      border: none;
+      border-radius: 6px;
+      background-color: #37474f; /* Darker blue-grey button */
+      color: #fff; /* White text */
+      cursor: pointer;
+      margin-bottom: 1.5rem; /* Added margin for spacing */
+    }
+
+    #addProductButton:hover {
+      background-color: #546e7a; /* Darker hover color */
+    }
+
+    /* Popup styles */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+    }
+
+    .popup-content {
+      background-color: #1A1A1A;
+      width: 300px;
+      margin: 100px auto;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .close {
+      color: #fff;
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="url"],
+    select {
+      width: calc(100% - 40px);
+      padding: 10px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #37474f;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #546e7a;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard - Content Management System</h1>
+    <button id="addProductButton" onclick="openPopup('addShopPopup')">Add New Shop</button> <!-- Add New Shop button -->
+  </header>
+  <main id="shopList">
+    <!-- Shop cards will be dynamically added here -->
+    {{range .}}
+    <div class="card">
+      <h3>{{.SName}}</h3>
+      <p><strong>Owner:</strong> {{.OName}}</p>
+      <p><strong>Area:</strong> {{.Area}}</p>
+      <p><strong>Password:</strong> {{.SPass}}</p>
+      <p><strong>Map Link:</strong> <a href="{{.MLink}}">{{.MLink}}</a></p>
+      <p><strong>Contact Details:</strong> {{.Contact}}</p>
+    </div>
+    {{end}}
+  </main>
+  <!-- Popup for adding new shop data -->
+  <div id="addShopPopup" class="popup">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup('addShopPopup')">&times;</span>
+      <h2>Add New Shop</h2>
+      <form id="addShopForm" onsubmit="addShop(event)">
+        <input type="text" id="shopName" placeholder="Shop Name" required>
+        <input type="text" id="shopOwner" placeholder="Owner Name" required>
+        <input type="text" id="shopArea" placeholder="Area" required>
+        <input type="password" id="shopPassword" placeholder="Password" required>
+        <input type="url" id="shopMapLink" placeholder="Map Link" required>
+        <select id="countryCode" required>
+          <option value="91">+91 (India)</option>
+          <!-- Add other country codes as needed -->
+        </select>
+        <input type="text" id="shopContactDetails" placeholder="Contact Details" required>
+        <input type="submit" value="Add Shop">
+      </form>
+    </div>
+  </div>
+  <script>
+
+    // Function to open popup
+    function openPopup(popupId) {
+      document.getElementById(popupId).style.display = 'block';
+    }
+
+    // Function to close popup
+    function closePopup(popupId) {
+      document.getElementById(popupId).style.display = 'none';
+    }
+
+    // Function to add new shop
+    function addShop(event) {
+      event.preventDefault();
+      const shopName = document.getElementById('shopName').value;
+      const shopOwner = document.getElementById('shopOwner').value;
+      const shopArea = document.getElementById('shopArea').value;
+      const shopPassword = document.getElementById('shopPassword').value;
+      const shopMapLink = document.getElementById('shopMapLink').value;
+      const countryCode = document.getElementById('countryCode').value;
+      const shopContactDetails = document.getElementById('shopContactDetails').value;
+      const newShop = {
+        
+        name: shopName,
+        uname: shopOwner,
+        area: shopArea,
+        pass: shopPassword,
+        lnk: shopMapLink,
+        countryCode: countryCode,
+        contactDetails: shopContactDetails,
+        contact:`${countryCode} ${shopContactDetails}`
+      };
+      const ShopToAdd = `
+        <div class="card">
+          <h3>${newShop.name}</h3>
+          <p><strong>Owner:</strong> ${newShop.uname}</p>
+          <p><strong>Area:</strong> ${newShop.area}</p>
+          <p><strong>Password:</strong> ${newShop.pass}</p>
+          <p><strong>Map Link:</strong> <a href="${newShop.lnk}">${newShop.lnk}</a></p>
+          <p><strong>Contact Details:</strong> ${newShop.countryCode} ${newShop.contactDetails}</p>
+          <button>Edit</button>
+        </div>
+        `;
+        document.getElementById('shopList').insertAdjacentHTML('beforeend', ShopToAdd);
+      closePopup('addShopPopup');
+        fetch("",{method:"POST",body:JSON.stringify(newShop)})
+        productForm.reset();
+      document.getElementById('addShopForm').reset();
+    }
+  </script>
+</body>
+</html>
