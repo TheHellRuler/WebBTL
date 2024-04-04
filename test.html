@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop CMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .bg {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #13142E, #030516, #000213, #000 100%);
+      animation: AnimateBG 20s ease infinite;
+    }
+
+    @keyframes AnimateBG {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(52, 58, 64, 0.8);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+      padding: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #495057;
+      font-weight: 700;
+      padding-right: 1rem; /* Added padding */
+    }
+
+    input, select {
+      width: calc(100% - 2rem); /* Adjusted width */
+      padding: 10px;
+      margin-bottom: 1.5rem;
+      margin-top: 0rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background-color: #fff;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 2rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background-color: #fff;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    button {
+      width: 200px; /* Set width to 200px */
+      position: absolute;
+      bottom: -30px; /* Adjust bottom spacing as needed */
+      right: 80px; /* Adjust right spacing as needed */
+      padding: 0.8rem;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-weight: 700;
+      border-radius: 6px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .popup {
+      display: none;
+      position: absolute;
+      top: -150px;
+      left: 0;
+      width:100%;
+      height: 100%;
+      z-index: 9999;
+      scale: 70%;
+    }
+    .feat {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.feat > * {
+  flex: 1 1 50%; /* Adjust flex properties as needed */
+  margin-right: 10px; /* Adjust margin as needed */
+}
+    .popup-content {
+      background-color: #fff;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 500px;
+      margin: 15% auto;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6c757d;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      position: relative;
+      background-color: #f2f2f2;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: row;
+      
+    }
+
+    .card-content {
+      flex: 1;
+    }
+
+    .card img {
+      height: 100%; /* Set height to 100% to fill the card vertically */
+      width: auto; /* Allow the width to adjust automatically */
+      max-width: 40%; /* Set max-width to prevent the image from taking up too much space */
+      border-radius: 10px; /* Optional: Add border-radius for a rounded image */
+      object-fit: cover; /* Optional: Scale the image while maintaining aspect ratio */
+      margin-right: 10px; /* Optional: Add margin for spacing */
+    }
+
+    .card h2 {
+      margin-top: 0;
+    }
+    .productType {
+      width : 150px;
+      font-size: 1rem;
+    }
+    option{
+      font-size: 1rem;
+    }
+    .Catsel{
+      width: 150px;
+    }
+
+    .input-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-container div {
+  flex: 1;
+}
+
+.input-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-weight: 700;
+  padding-right: 1rem;
+}
+.Todelete{
+  color:white;
+}
+
+  </style>
+</head>
+<body>
+  <div class="bg">
+    <header>
+      <h1 style="margin: 0;">{{.Nm}} Shop CMS</h1>
+    </header>
+    <main>
+      <section id="addProductPopup" class="popup">
+        <div class="popup-content">
+          <span class="close">&times;</span>
+          <h2>Add Product</h2>
+          <form id="productForm">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+            <div class="input-container">
+              <div>
+            <label for="productType" >Product Type:</label>
+            <select id="productType" class="productType">
+              <option value="kg">Kg</option>
+              <option value="nos">Nos</option>
+            </select></div>
+          <div>
+            <label for="Catsel">Category</label>
+            <select name="Cat" id="Catsel" class="Catsel">
+              <option value="Food">Food</option>
+             <option value="Cloth">Cloth</option> Cloth 
+             <option value="Electronics">Electronics</option> Electronics
+             <option value="Cosmetics">Cosmetics</option> Cosmetics
+             <option value="Others">Others</option> Others
+            </select></div>
+          </div>
+          <div class="input-container">
+            <div>
+              <label for="productStock">Stock:</label>
+              <input type="number" id="productStock" required>
+            </div>
+            <div>
+              <label for="productPrice">Price:</label>
+              <input type="number" step=".01" id="productPrice" required>
+            </div>
+          </div>
+          <label for="productDesc">Product description:</label>
+          <textarea type="text" id="productDesc" style="height: 100px;width: calc(100% - 2rem);font-size: 20px ;" required></textarea>
+            <div class="file-upload">
+              <label for="fileInput">Upload Photo:</label>
+              <input type="file" id="fileInput">
+            </div>
+            <div class="link-preview">
+              <label for="linkInput">Link Preview:</label>
+              <input type="text" id="linkInput" readonly required>
+            </div>
+            <button type="submit">Add Product</button>
+          </form>
+        </div>
+      </section>
+
+      <div class="container" id="container">
+        {{if .Dt}}
+          {{range .Dt}}
+          <div class="card">
+            <div class="card-content">
+              <h2>{{.PName}}</h2>
+             <p>Price: ${{.Price}}</p>
+              <p>Stock: {{.PStock}}</p>
+              <p>Category: {{.Cat}}</p>
+              <p>Description: {{.Desc}}</p>
+            </div>
+            <img src="{{.Photo}}" alt="Product Image">
+          </div>
+          {{end}}
+            
+        {{else}}
+        <p class="Todelete">No Data, Add some by clicking the button below.</p>
+        {{end}}
+      </div>
+    </main>
+    <button id="addProductButton">Add Product</button> <!-- Button for adding a product -->
+    <input type="text" id="ForID" hidden readonly value="{{.Id}}">
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const addProductPopup = document.getElementById('addProductPopup');
+      const productForm = document.getElementById('productForm');
+      const fileInput = document.getElementById('fileInput');
+      const linkesh = document.getElementById('linkInput');
+
+      // Function to show the add product popup
+      function showAddProductPopup() {
+        addProductPopup.style.display = 'block';
+      }
+
+      // Event listener to show the add product popup when the button is clicked
+      document.getElementById('addProductButton').addEventListener('click', showAddProductPopup);
+
+      // Function to close the add product popup
+      function closeAddProductPopup() {
+        addProductPopup.style.display = 'none';
+      }
+
+      // Event listener to close the add product popup when the close button is clicked
+      document.querySelector('.close').addEventListener('click', closeAddProductPopup);
+
+      // Event listener for file input change
+      fileInput.addEventListener('change', function() {
+       UploadPhoto();
+      });
+
+      // Event listener for the form submission
+      productForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const productName = document.getElementById('productName').value;
+        const productType = document.getElementById('productType').value;
+        const productStock = document.getElementById('productStock').value;
+        const productPrice = document.getElementById('productPrice').value;
+        const productCat = document.getElementById('Catsel').value;
+        const productDesc = document.getElementById("productDesc").value;
+        const ele = document.getElementsByClassName("Todelete");
+        const idd = document.getElementById("ForID").value;
+        ele[0]?.remove()
+        const productListItem = `
+        <div class="card">
+          <div class="card-content">
+            <h2>${productName}</h2>
+           <p>Price: $${productPrice}</p>
+            <p>Stock: ${productStock} ${productType}</p>
+            <p>Category: ${productCat}</p>
+            <p>Description: ${productDesc}</p>
+          </div>
+          <img src="${linkesh.value}" alt="Product Image">
+        </div>
+        `;
+        document.getElementById('container').insertAdjacentHTML('beforeend', productListItem);
+        closeAddProductPopup();
+        data ={
+            pname:productName,
+            ptype:productType,
+            pstock:productStock,
+            price:productPrice,
+            photo:linkesh.value,
+            cat:productCat,
+            desc:productDesc,
+            shid:idd
+        }
+        console.log(data.shid,data.desc)
+        fetch("",{method:"POST",body:JSON.stringify(data)})
+        productForm.reset();
+      });
+      function UploadPhoto() {
+        const file = fileInput.files[0];
+        if (file) {
+          linkesh.value="Uploading.. Please wait."
+          const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('http://localhost:4000/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      linkesh.value = data.link;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      linkesh.value = 'An error occurred while uploading the photo.';
+    });
+  }
+}
+    });
+  </script>
+</body>
+</html>
