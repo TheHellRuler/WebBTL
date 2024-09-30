@@ -126,7 +126,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 			datfr["Nm"] = bod["name"]
 			datfr["Dt"] = data
 			datfr["Id"] = bod["idd"]
-			tmpl, _ := template.ParseFiles("templates\\test.html")
+			tmpl, _ := template.ParseFiles("templates\\main.tmpl")
 			tmpl.Execute(w, datfr)
 		}
 	case "POST":
@@ -243,7 +243,7 @@ func Shopesh(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		{
-			tmpl, _ := template.ParseFiles("templates\\admin.html")
+			tmpl, _ := template.ParseFiles("templates\\admin.tmpl")
 			var Data []Shop
 			res, _ := adcoll.Find(ctx.TODO(), bson.D{{}})
 			res.All(ctx.TODO(), &Data)
